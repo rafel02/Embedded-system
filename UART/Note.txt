@@ -1,0 +1,81 @@
+UART-
+
+Uart is universal asynchronous receiver and transmitter protocol. This is serial
+communication. It have two line. One is for transmission and another is for 
+reception.
+
+In this project I interface 8051 to MAX232 IC to change transistor level signal voltage value. On doing this a UART line can be connected to PC.
+
+** Frame structure in Asynchronous communication **
+
+START bit: It is a bit with which serial communication starts and it is always low.
+
+Data bits packet: Data bits can be 5 to 9 bits packet. Normally we use 8 data bit packet, which is always sent after the START bit.
+
+STOP bit: This is one or two bits. It is sent after the data bits packet to indicate the end of the frame. The stop bit is always logic high.
+
+
+** UART have following register **
+
+SCON - Serial control register
+TCON - Timer control register for baud rate control
+TMOD - Timer start or stop register
+SBUFF - Serial buffer for transmission and reception
+TH1 - Timer 1
+
+Baud Rate calculation:
+
+1. To meet the standard baud rates generally crystal with 11.0592 MHz is used.
+2. As we know, 8051 divides crystal frequency by 12 to get a machine cycle frequency of 921.6 kHz.
+3. The internal UART block of 8051 divides this machine cycle frequency by 32, which gives the frequency of 28800 Hz which is used by UART.
+4. To achieve a baud rate of 9600, again 28800 Hz frequency should be divided by 3.
+ 5.This is achieved by using Timer1 in mode-2 (auto-reload mode) by putting 253 in TH1 (8-bit reg.)
+ 6. So 28800 Hz will get divided by 3 as the timer will overflow after every 3 cycles.
+ 7. we can achieve different baud rates by putting the division factor in the TH1 register.
+
+
+
+** SCON register **
+
+Serial control register SCON is used to set serial communication operation modes.
+
+Bit 1 - TI: Transmit Interrupt Flag
+
+This bit indicates the transmission is complete and gets set after transmitting the byte from the buffer. Normally TI (Transmit Interrupt Flag) is set by hardware at the end of the 8th bit in mode 0 and at the beginning of stop bit in other modes.
+
+Bit 0 – RI: Receive Interrupt Flag
+
+This bit indicates reception is complete and gets set after receiving the complete byte in the buffer. Normally RI (Receive Interrupt Flag) is set by hardware in receiving mode at the end of the 8th bit in mode 0 and at the stop bit receive time in other modes.
+
+Bit 4 - REN: Receive Enable
+        1 = Receive enable
+        0 = Receive disable
+
+Bit 7:6 - SM0:SM1: Serial Mode Specifier
+ Normally mode-1 (SM0 =0, SM1=1) is used with 8 data bits, 1 start bit, and 1 stop bit.
+
+** TMOD register **
+
+Bit 4 and 5 -
+
+M1-M0:Mode Control
+
+00-Mode 0, 13 bit count mode
+01-Mode 1, 16 bit count mode
+10-Mode 2, Auto reload mode
+11-Mode 3, Multiple mode
+
+** TCON register **
+
+TRx: Timer x run control
+0 = Timer not running
+1 = Timer running
+
+TFx: Timer x OverFlow flag
+0 = Timer has not overflowed/rolled over
+1 = Timer has overflowed/rolled over
+
+** Reference **
+
+[1] https://hackprojects.wordpress.com/forum/8051-2/serial-uart-communication-in-8051-microcontroller/
+[2] https://www.electronicwings.com/8051/8051-uart
